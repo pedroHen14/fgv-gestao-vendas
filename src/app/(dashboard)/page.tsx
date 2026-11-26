@@ -36,7 +36,7 @@ export default function PainelDoDiaPage() {
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <Button asChild size="lg" className="h-12 text-base font-semibold">
-            <Link href="/pedidos">
+            <Link href="/pedidos/novo">
               <Plus className="size-5" />
               Novo Orçamento
             </Link>
@@ -47,7 +47,7 @@ export default function PainelDoDiaPage() {
             variant="secondary"
             className="h-12 text-base font-semibold"
           >
-            <Link href="/pedidos">
+            <Link href="/pedidos/novo?modo=pedido">
               <ClipboardList className="size-5" />
               Lançar Pedido
             </Link>
@@ -58,7 +58,7 @@ export default function PainelDoDiaPage() {
             variant="outline"
             className="h-12 text-base font-semibold"
           >
-            <Link href="/clientes">
+            <Link href="/clientes/novo">
               <UserPlus className="size-5" />
               Novo Cliente
             </Link>

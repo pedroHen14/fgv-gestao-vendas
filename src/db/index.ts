@@ -17,9 +17,17 @@ function getConnectionString(): string {
 }
 
 function createClient() {
-  return postgres(getConnectionString(), {
-    prepare: false, // Obrigatório para Supabase Transaction Pooler (porta 6543)
-    max: process.env.NODE_ENV === "production" ? 5 : 10,
+  const connectionString = getConnectionString();
+  const isLocal =
+    connectionString.includes("localhost") ||
+    connectionString.includes("127.0.0.1");
+
+  return postgres(connectionString, {
+    prepare: false, // Compatível com Supabase Transaction Pooler (6543) e Session Pooler (5432)
+    ssl: isLocal ? false : "require",
+    max: 5,
+    connect_timeout: 10,
+    idle_timeout: 20,
   });
 }
 

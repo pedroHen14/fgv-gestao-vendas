@@ -69,3 +69,64 @@ export function formatCep(value: string | null | undefined): string {
   }
   return value;
 }
+
+export function formatTelefone(value: string | null | undefined): string {
+  if (!value) return "—";
+  const digits = onlyDigits(value);
+  if (digits.length === 11) {
+    return digits.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+  }
+  if (digits.length === 10) {
+    return digits.replace(/(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+  }
+  return value;
+}
+
+export function getTodayIsoDate(): string {
+  const now = new Date();
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Sao_Paulo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(now);
+  const year = parts.find((p) => p.type === "year")?.value ?? "2026";
+  const month = parts.find((p) => p.type === "month")?.value ?? "01";
+  const day = parts.find((p) => p.type === "day")?.value ?? "01";
+  return `${year}-${month}-${day}`;
+}
+
+export function roundMoney(value: number): number {
+  return Math.round((value + Number.EPSILON) * 100) / 100;
+}
+
+export function formatSuggestedPedidoNumero(
+  proximoNumero: number | null | undefined,
+  templatePdf?: string | null
+): string {
+  if (proximoNumero === null || proximoNumero === undefined) return "";
+  const raw = String(proximoNumero);
+  if (templatePdf === "BONES_MOCKUP" && raw.length < 4) {
+    return raw.padStart(4, "0");
+  }
+  return raw;
+}
+
+export function extractNextNumeroFromPedido(
+  numeroPedido: string | null | undefined,
+  currentProximo: number | null | undefined
+): number | null {
+  if (numeroPedido) {
+    const match = numeroPedido.trim().match(/^(\d+)/);
+    if (match) {
+      const parsed = Number.parseInt(match[1], 10);
+      if (Number.isFinite(parsed) && parsed > 0) {
+        return Math.max(parsed + 1, (currentProximo ?? 0));
+      }
+    }
+  }
+  if (currentProximo && currentProximo > 0) {
+    return currentProximo + 1;
+  }
+  return null;
+}

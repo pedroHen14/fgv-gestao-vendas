@@ -38,7 +38,7 @@ export function SidebarContent({ onNavigate }: SidebarContentProps) {
 
       <div className="p-4">
         <Button asChild className="w-full justify-center font-semibold" size="lg">
-          <Link href="/pedidos" onClick={onNavigate}>
+          <Link href="/pedidos/novo" onClick={onNavigate}>
             <Plus className="size-4" />
             Novo Orçamento
           </Link>

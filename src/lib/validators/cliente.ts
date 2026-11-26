@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { onlyDigits } from "@/lib/formatters";
 
 export const enderecoSchema = z.object({
   id: z.string().uuid().optional(),
@@ -40,16 +41,55 @@ export const compradorSchema = z.object({
   ativo: z.boolean().default(true),
 });
 
-export const clienteSchema = z.object({
-  tipo_pessoa: z.enum(["PJ", "PF"]).default("PJ"),
-  razao_social: z.string().trim().min(1, "Informe o nome ou razão social."),
-  cpf_cnpj: z.string().trim().nullable().optional(),
-  inscricao_estadual: z.string().trim().nullable().optional(),
-  data_nascimento: z.string().trim().nullable().optional(),
-  origem_indicacao: z.string().trim().nullable().optional(),
-  observacoes: z.string().trim().nullable().optional(),
+export const clienteSchema = z
+  .object({
+    tipo_pessoa: z.enum(["PJ", "PF"]).default("PJ"),
+    razao_social: z.string().trim().min(1, "Informe o nome ou razão social."),
+    cpf_cnpj: z.string().trim().nullable().optional(),
+    inscricao_estadual: z.string().trim().nullable().optional(),
+    data_nascimento: z.string().trim().nullable().optional(),
+    origem_indicacao: z.string().trim().nullable().optional(),
+    observacoes: z.string().trim().nullable().optional(),
+  })
+  .superRefine((data, ctx) => {
+    const rawDoc = data.cpf_cnpj?.trim();
+    if (rawDoc) {
+      const digits = onlyDigits(rawDoc);
+      if (data.tipo_pessoa === "PJ" && digits.length !== 14) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["cpf_cnpj"],
+          message: "Informe um CNPJ válido com 14 números.",
+        });
+      }
+      if (data.tipo_pessoa === "PF" && digits.length !== 11) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["cpf_cnpj"],
+          message: "Informe um CPF válido com 11 números.",
+        });
+      }
+    }
+  });
+
+export const clienteComInicialSchema = z.object({
+  cliente: clienteSchema,
+  endereco: enderecoSchema.nullable().optional(),
+  comprador: compradorSchema.nullable().optional(),
+});
+
+export const interacaoSchema = z.object({
+  tipo: z
+    .enum(["EMAIL", "WHATSAPP", "LIGACAO", "FOLLOWUP", "OBSERVACAO"])
+    .default("EMAIL"),
+  resumo: z.string().trim().min(1, "Descreva o contato ou anotação."),
+  comprador_id: z.string().uuid().or(z.literal("")).nullable().optional(),
+  pedido_id: z.string().uuid().or(z.literal("")).nullable().optional(),
+  data_interacao: z.string().trim().nullable().optional(),
 });
 
 export type ClienteInput = z.infer<typeof clienteSchema>;
 export type EnderecoInput = z.infer<typeof enderecoSchema>;
 export type CompradorInput = z.infer<typeof compradorSchema>;
+export type ClienteComInicialInput = z.infer<typeof clienteComInicialSchema>;
+export type InteracaoInput = z.infer<typeof interacaoSchema>;
