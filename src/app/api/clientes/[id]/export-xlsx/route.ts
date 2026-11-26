@@ -7,6 +7,7 @@ import { buildClienteXlsxFilename } from "@/lib/storage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 const uuidSchema = z.string().uuid();
 

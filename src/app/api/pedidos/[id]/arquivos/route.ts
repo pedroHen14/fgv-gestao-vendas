@@ -14,6 +14,7 @@ import {
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 const uuidSchema = z.string().uuid();
 
@@ -85,7 +86,7 @@ export async function POST(
 
     if (rawFile.size > MAX_UPLOAD_SIZE_BYTES) {
       return NextResponse.json(
-        { error: "O arquivo ultrapassa o limite máximo de 20 MB." },
+        { error: "O arquivo ultrapassa o limite máximo de 4 MB por envio." },
         { status: 400 }
       );
     }

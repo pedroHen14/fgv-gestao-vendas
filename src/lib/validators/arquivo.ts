@@ -9,7 +9,7 @@ export const TIPO_ARQUIVO_VALUES = [
   "OUTRO",
 ] as const;
 
-export const MAX_UPLOAD_SIZE_BYTES = 20 * 1024 * 1024; // 20 MB (limite do bucket)
+export const MAX_UPLOAD_SIZE_BYTES = 4 * 1024 * 1024; // 4 MB (margem segura p/ limite de 4,5 MB da Vercel Serverless)
 
 export const ALLOWED_UPLOAD_MIME_TYPES = new Set([
   "image/jpeg",

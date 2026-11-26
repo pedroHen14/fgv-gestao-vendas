@@ -25,18 +25,17 @@ function createClient() {
   return postgres(connectionString, {
     prepare: false, // Compatível com Supabase Transaction Pooler (6543) e Session Pooler (5432)
     ssl: isLocal ? false : "require",
-    max: 5,
+    max: process.env.NODE_ENV === "production" ? 3 : 5,
     connect_timeout: 10,
     idle_timeout: 20,
   });
 }
 
 export function getDb() {
-  const client = globalForDb.postgresClient ?? createClient();
-  if (process.env.NODE_ENV !== "production") {
-    globalForDb.postgresClient = client;
+  if (!globalForDb.postgresClient) {
+    globalForDb.postgresClient = createClient();
   }
-  return drizzle(client, { schema });
+  return drizzle(globalForDb.postgresClient, { schema });
 }
 
 export type Database = ReturnType<typeof getDb>;

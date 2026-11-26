@@ -27,6 +27,7 @@ import {
 } from "@/lib/constants";
 import { formatDateTimeBR, formatFileSize } from "@/lib/formatters";
 import { compressImageIfNeeded } from "@/lib/image-compression";
+import { MAX_UPLOAD_SIZE_BYTES } from "@/lib/validators/arquivo";
 import { ConfirmDialog } from "@/components/layout/confirm-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -116,6 +117,13 @@ export function PedidoArquivosSection({ pedido }: PedidoArquivosSectionProps) {
         );
         if (compressed) {
           otimizados++;
+        }
+
+        if (fileToSend.size > MAX_UPLOAD_SIZE_BYTES) {
+          toast.error(
+            `O arquivo "${originalFile.name}" ultrapassa o limite máximo de 4 MB por envio.`
+          );
+          continue;
         }
 
         setUploadStatusText(
@@ -457,7 +465,7 @@ export function PedidoArquivosSection({ pedido }: PedidoArquivosSectionProps) {
                       <strong className="text-foreground">
                         {TIPO_ARQUIVO_LABELS[tipoUpload]}
                       </strong>{" "}
-                      • Aceita JPG, PNG, PDF, Excel e Word (até 20 MB)
+                      • Aceita JPG, PNG, PDF, Excel e Word (até 4 MB por arquivo)
                     </p>
                   </div>
                 </>
