@@ -191,6 +191,13 @@ export const atualizarStatusPedidoSchema = z.object({
   status: z.enum(STATUS_PEDIDO_VALUES),
 });
 
+export const adiarFollowupSchema = z.object({
+  pedido_id: z.string().uuid(),
+  nova_data: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Informe uma data válida para o próximo retorno."),
+});
+
 export interface TotaisCalculados {
   itens: { valorTotal: number }[];
   subtotal: number;

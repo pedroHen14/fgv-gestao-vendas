@@ -83,17 +83,96 @@ export function formatTelefone(value: string | null | undefined): string {
 }
 
 export function getTodayIsoDate(): string {
-  const now = new Date();
+  return toSaoPauloIsoDate(new Date());
+}
+
+export function toSaoPauloIsoDate(value: Date | string): string {
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return value;
+  }
+  const date = typeof value === "string" ? new Date(value) : value;
+  if (Number.isNaN(date.getTime())) {
+    return "2026-01-01";
+  }
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: "America/Sao_Paulo",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  }).formatToParts(now);
+  }).formatToParts(date);
   const year = parts.find((p) => p.type === "year")?.value ?? "2026";
   const month = parts.find((p) => p.type === "month")?.value ?? "01";
   const day = parts.find((p) => p.type === "day")?.value ?? "01";
   return `${year}-${month}-${day}`;
+}
+
+function parseIsoDateUtc(isoDate: string): Date {
+  const [yearStr, monthStr, dayStr] = isoDate.split("-");
+  const year = Number.parseInt(yearStr ?? "2026", 10);
+  const month = Number.parseInt(monthStr ?? "1", 10);
+  const day = Number.parseInt(dayStr ?? "1", 10);
+  return new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+}
+
+export function addDaysToIsoDate(isoDate: string, days: number): string {
+  const date = parseIsoDateUtc(isoDate);
+  date.setUTCDate(date.getUTCDate() + days);
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+export function diffIsoDays(fromIsoDate: string, toIsoDate: string): number {
+  const from = parseIsoDateUtc(fromIsoDate).getTime();
+  const to = parseIsoDateUtc(toIsoDate).getTime();
+  return Math.round((to - from) / 86_400_000);
+}
+
+export function getMonthRangeFromIso(isoDate: string): {
+  startIso: string;
+  endIso: string;
+  label: string;
+} {
+  const [yearStr, monthStr] = isoDate.split("-");
+  const year = Number.parseInt(yearStr ?? "2026", 10);
+  const month = Number.parseInt(monthStr ?? "1", 10);
+  const lastDay = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  const startIso = `${year}-${String(month).padStart(2, "0")}-01`;
+  const endIso = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+
+  const rawLabel = new Intl.DateTimeFormat("pt-BR", {
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(year, month - 1, 15)));
+
+  const label = rawLabel.charAt(0).toUpperCase() + rawLabel.slice(1);
+  return { startIso, endIso, label };
+}
+
+export function formatPrazoRelativo(
+  targetIsoDate: string,
+  todayIso: string
+): { texto: string; urgencia: "atrasado" | "hoje" | "proximo" | "normal" } {
+  const diff = diffIsoDays(todayIso, targetIsoDate);
+  if (diff < 0) {
+    const dias = Math.abs(diff);
+    return {
+      texto: dias === 1 ? "Atrasado há 1 dia" : `Atrasado há ${dias} dias`,
+      urgencia: "atrasado",
+    };
+  }
+  if (diff === 0) {
+    return { texto: "Vence hoje", urgencia: "hoje" };
+  }
+  if (diff === 1) {
+    return { texto: "Amanhã", urgencia: "proximo" };
+  }
+  if (diff <= 3) {
+    return { texto: `Em ${diff} dias`, urgencia: "proximo" };
+  }
+  return { texto: `Em ${diff} dias`, urgencia: "normal" };
 }
 
 export function roundMoney(value: number): number {

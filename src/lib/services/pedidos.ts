@@ -376,6 +376,13 @@ export async function atualizarStatusPedido(id: string, status: StatusPedido) {
   if (status === "APROVADO" && !existing.dataPedido) {
     updates.dataPedido = getTodayIsoDate();
   }
+  if (
+    status === "APROVADO" ||
+    status === "CANCELADO" ||
+    status === "PERDIDO"
+  ) {
+    updates.proximoFollowup = null;
+  }
   if (status === "ENTREGUE" && !existing.dataEntregaCliente) {
     updates.dataEntregaCliente = getTodayIsoDate();
   }
@@ -385,6 +392,20 @@ export async function atualizarStatusPedido(id: string, status: StatusPedido) {
     .set(updates)
     .where(eq(pedidos.id, id))
     .returning();
+
+  return updated ?? null;
+}
+
+export async function atualizarProximoFollowup(id: string, novaData: string) {
+  const db = getDb();
+  const [updated] = await db
+    .update(pedidos)
+    .set({
+      proximoFollowup: novaData,
+      updatedAt: new Date(),
+    })
+    .where(eq(pedidos.id, id))
+    .returning({ id: pedidos.id, clienteId: pedidos.clienteId });
 
   return updated ?? null;
 }

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { AuthRequiredError, requireAuthenticatedUser } from "@/lib/auth";
 import {
+  adiarFollowupSchema,
   atualizarStatusPedidoSchema,
   converterOrcamentoSchema,
   pedidoSchema,
@@ -10,6 +11,7 @@ import {
   type PedidoInput,
 } from "@/lib/validators/pedido";
 import {
+  atualizarProximoFollowup,
   atualizarStatusPedido,
   converterOrcamentoEmPedido,
   createPedido,
@@ -164,6 +166,49 @@ export async function atualizarStatusPedidoAction(
     return {
       success: false,
       error: formatError(error, "Não foi possível atualizar o status."),
+    };
+  }
+}
+
+export async function adiarFollowupAction(
+  pedidoId: string,
+  novaData: string
+): Promise<PedidoActionResult> {
+  try {
+    await requireAuthenticatedUser();
+    const parsed = adiarFollowupSchema.safeParse({
+      pedido_id: pedidoId,
+      nova_data: novaData,
+    });
+    if (!parsed.success) {
+      return {
+        success: false,
+        error:
+          parsed.error.issues[0]?.message ??
+          "Data inválida para reagendar o retorno.",
+      };
+    }
+
+    const updated = await atualizarProximoFollowup(
+      parsed.data.pedido_id,
+      parsed.data.nova_data
+    );
+    if (!updated) {
+      return { success: false, error: "Orçamento não encontrado." };
+    }
+
+    revalidatePath("/");
+    revalidatePath("/pedidos");
+    revalidatePath(`/pedidos/${pedidoId}`);
+    revalidatePath(`/clientes/${updated.clienteId}`);
+    return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error: formatError(
+        error,
+        "Não foi possível reagendar a data de retorno."
+      ),
     };
   }
 }
