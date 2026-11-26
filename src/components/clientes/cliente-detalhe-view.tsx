@@ -8,6 +8,7 @@ import {
   Building2,
   Calendar,
   ClipboardList,
+  FileSpreadsheet,
   Loader2,
   Mail,
   MapPin,
@@ -153,6 +154,43 @@ export function ClienteDetalheView({ cliente }: ClienteDetalheViewProps) {
     pedido_id: "",
   });
   const [deletingInteracaoId, setDeletingInteracaoId] = useState<string | null>(null);
+  const [isExportingXlsx, setIsExportingXlsx] = useState(false);
+
+  const handleExportXlsx = async () => {
+    setIsExportingXlsx(true);
+    try {
+      const response = await fetch(`/api/clientes/${cliente.id}/export-xlsx`);
+      if (!response.ok) {
+        const data = (await response.json().catch(() => ({}))) as {
+          error?: string;
+        };
+        toast.error(
+          data.error || "Não foi possível exportar a planilha do cliente."
+        );
+        return;
+      }
+
+      const blob = await response.blob();
+      const disposition = response.headers.get("Content-Disposition") ?? "";
+      const match = disposition.match(/filename="([^"]+)"/);
+      const filename = match?.[1] || "historico-cliente.xlsx";
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+
+      toast.success("Planilha (.xlsx) exportada com sucesso!");
+    } catch {
+      toast.error("Erro ao exportar planilha. Tente novamente.");
+    } finally {
+      setIsExportingXlsx(false);
+    }
+  };
 
   // Totais calculados
   const pedidosFaturados = cliente.pedidos.filter((p) =>
@@ -599,11 +637,29 @@ export function ClienteDetalheView({ cliente }: ClienteDetalheViewProps) {
                   Substitui a planilha individual deste cliente com soma automática.
                 </CardDescription>
               </div>
-              <div className="rounded-xl bg-primary/10 px-4 py-2 text-right">
-                <p className="text-xs font-medium text-primary">Soma acumulada (fechados)</p>
-                <p className="text-base font-bold text-primary tabular-nums">
-                  {formatCurrencyBRL(valorAcumulado)}
-                </p>
+              <div className="flex flex-wrap items-center gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={isExportingXlsx}
+                  onClick={handleExportXlsx}
+                  className="font-semibold"
+                >
+                  {isExportingXlsx ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <FileSpreadsheet className="size-4 text-primary" />
+                  )}
+                  {isExportingXlsx
+                    ? "Gerando planilha..."
+                    : "Exportar Planilha (.xlsx)"}
+                </Button>
+                <div className="rounded-xl bg-primary/10 px-4 py-2 text-right">
+                  <p className="text-xs font-medium text-primary">Soma acumulada (fechados)</p>
+                  <p className="text-base font-bold text-primary tabular-nums">
+                    {formatCurrencyBRL(valorAcumulado)}
+                  </p>
+                </div>
               </div>
             </CardHeader>
             <CardContent>

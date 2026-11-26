@@ -12,6 +12,13 @@ export type StatusPedido =
   | "CANCELADO"
   | "PERDIDO";
 export type FormaPagamento = "DEPOSITO" | "BOLETO" | "PIX" | "OUTRO";
+export type TipoArquivoPedido =
+  | "PEDIDO_PDF"
+  | "MOCKUP"
+  | "ORDEM_COMPRA"
+  | "NOTA_FISCAL"
+  | "COMPROVANTE"
+  | "OUTRO";
 export type TipoInteracao =
   | "EMAIL"
   | "WHATSAPP"
@@ -144,6 +151,33 @@ export const FORMA_PAGAMENTO_LABELS: Record<FormaPagamento, string> = {
   BOLETO: "Boleto",
   PIX: "PIX",
   OUTRO: "Outro",
+};
+
+export const TIPO_ARQUIVO_LABELS: Record<TipoArquivoPedido, string> = {
+  MOCKUP: "Arte / Mockup",
+  ORDEM_COMPRA: "Ordem de Compra",
+  NOTA_FISCAL: "Nota Fiscal",
+  COMPROVANTE: "Comprovante",
+  PEDIDO_PDF: "Folha do Pedido (PDF)",
+  OUTRO: "Outro Documento",
+};
+
+export const TIPO_ARQUIVO_ORDEM_UI: TipoArquivoPedido[] = [
+  "MOCKUP",
+  "ORDEM_COMPRA",
+  "NOTA_FISCAL",
+  "COMPROVANTE",
+  "PEDIDO_PDF",
+  "OUTRO",
+];
+
+export const TIPO_ARQUIVO_ZIP_PREFIX: Record<TipoArquivoPedido, string> = {
+  MOCKUP: "02_MOCKUP",
+  ORDEM_COMPRA: "03_ORDEM_COMPRA",
+  NOTA_FISCAL: "04_NOTA_FISCAL",
+  COMPROVANTE: "05_COMPROVANTE",
+  PEDIDO_PDF: "06_PEDIDO_SALVO",
+  OUTRO: "07_OUTRO",
 };
 
 export const TIPO_INTERACAO_LABELS: Record<TipoInteracao, string> = {

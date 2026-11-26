@@ -5,6 +5,7 @@ import {
   compradores,
   enderecos,
   fornecedores,
+  pedidoArquivos,
   pedidoItens,
   pedidos,
 } from "@/db/schema";
@@ -95,7 +96,9 @@ export async function getPedidoById(id: string) {
       itens: {
         orderBy: [asc(pedidoItens.ordem)],
       },
-      arquivos: true,
+      arquivos: {
+        orderBy: [desc(pedidoArquivos.createdAt)],
+      },
     },
   });
 }

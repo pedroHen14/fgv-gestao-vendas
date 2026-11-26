@@ -726,7 +726,7 @@ export function PedidoForm({
                     {selectedFornecedor.templatePdf === "CONFECCAO_GRADE"
                       ? "Grade de tamanhos habilitada para confecção."
                       : selectedFornecedor.templatePdf === "BONES_MOCKUP"
-                        ? "Layout com mockup em destaque (envio de imagem na Sprint 3)."
+                        ? "Layout com mockup em destaque — após salvar, envie a arte/mockup na pasta do pedido."
                         : "Layout padrão FGV."}
                   </span>
                 </div>

@@ -10,8 +10,6 @@ import {
   Calendar,
   CheckCircle2,
   Factory,
-  FileText,
-  FolderArchive,
   MapPin,
   Pencil,
   Ruler,
@@ -45,6 +43,7 @@ import {
   deletePedidoAction,
 } from "@/app/(dashboard)/pedidos/actions";
 import { ConverterOrcamentoDialog } from "@/components/pedidos/converter-orcamento-dialog";
+import { PedidoArquivosSection } from "@/components/pedidos/pedido-arquivos-section";
 import { ConfirmDialog } from "@/components/layout/confirm-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -649,31 +648,8 @@ export function PedidoDetalheView({ pedido }: PedidoDetalheViewProps) {
         </div>
       ) : null}
 
-      {/* Prévia Sprint 3: PDF e Pasta Virtual */}
-      <Card className="border-dashed bg-muted/20">
-        <CardContent className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-3">
-            <div className="bg-primary/10 text-primary flex size-10 shrink-0 items-center justify-center rounded-xl">
-              <FolderArchive className="size-5" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-foreground">
-                Folha de Pedido em PDF e Pasta Virtual (.zip) — Sprint 3
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Na próxima etapa você poderá gerar o PDF no layout do fabricante,
-                anexar mockups/NF e baixar a pasta completa deste pedido em 1 clique.
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Button type="button" variant="outline" size="sm" disabled>
-              <FileText className="size-4" />
-              Gerar PDF (em breve)
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Folha de Pedido (PDF) e Pasta Virtual (.zip) */}
+      <PedidoArquivosSection pedido={pedido} />
 
       {/* Dialog de Conversão em Pedido */}
       <ConverterOrcamentoDialog

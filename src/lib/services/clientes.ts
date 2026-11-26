@@ -136,6 +136,46 @@ export async function getClienteById(id: string) {
 
 export type ClienteDetalhe = NonNullable<Awaited<ReturnType<typeof getClienteById>>>;
 
+export async function getClienteParaExportacaoXlsx(id: string) {
+  const db = getDb();
+  return db.query.clientes.findFirst({
+    where: eq(clientes.id, id),
+    with: {
+      enderecos: {
+        orderBy: [desc(enderecos.principal), asc(enderecos.createdAt)],
+      },
+      compradores: {
+        orderBy: [desc(compradores.ativo), asc(compradores.nome)],
+      },
+      pedidos: {
+        orderBy: [desc(pedidos.dataPedido), desc(pedidos.createdAt)],
+        with: {
+          fornecedor: true,
+          comprador: true,
+          itens: true,
+        },
+      },
+      interacoes: {
+        orderBy: [desc(interacoesCliente.dataInteracao)],
+        with: {
+          comprador: true,
+          pedido: {
+            columns: {
+              id: true,
+              numeroPedido: true,
+              status: true,
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+export type ClienteParaExportacao = NonNullable<
+  Awaited<ReturnType<typeof getClienteParaExportacaoXlsx>>
+>;
+
 export async function createClienteComInicial(input: ClienteComInicialInput) {
   const db = getDb();
 
