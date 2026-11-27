@@ -26,6 +26,12 @@ export type TipoInteracao =
   | "FOLLOWUP"
   | "OBSERVACAO";
 export type ModeloGrade = "MASCULINO" | "FEMININO" | "UNISSEX" | "INFANTIL";
+export type FormatoConteudo = "CARROSSEL" | "REELS_SEM_APARECER" | "FOTO_UNICA";
+export type StatusConteudo =
+  | "IDEIA"
+  | "ROTEIRO_PRONTO"
+  | "ARTE_CANVA"
+  | "POSTADO";
 
 export type BadgeVariant =
   | "default"
@@ -237,3 +243,60 @@ export const FEIRAS_AGRO_COMUNS = [
   "ANDAV",
   "SIPAT",
 ] as const;
+
+export const FORMATO_CONTEUDO_META: Record<
+  FormatoConteudo,
+  { label: string; shortLabel: string; description: string }
+> = {
+  CARROSSEL: {
+    label: "Carrossel (Canva)",
+    shortLabel: "Carrossel",
+    description:
+      "Sequência de slides com fotos dos produtos e textos curtos fáceis de montar no Canva.",
+  },
+  REELS_SEM_APARECER: {
+    label: "Reels (Sem aparecer)",
+    shortLabel: "Reels sem aparecer",
+    description:
+      "Sequência de fotos ou vídeos curtos do produto + texto na tela + música (sem precisar gravar rosto ou voz).",
+  },
+  FOTO_UNICA: {
+    label: "Foto Única",
+    shortLabel: "Foto Única",
+    description:
+      "Uma foto caprichada do produto ou entrega pronta com legenda comercial direta.",
+  },
+};
+
+export const STATUS_CONTEUDO_META: Record<
+  StatusConteudo,
+  { label: string; shortLabel: string; variant: BadgeVariant }
+> = {
+  IDEIA: {
+    label: "Ideia",
+    shortLabel: "Ideia",
+    variant: "outline",
+  },
+  ROTEIRO_PRONTO: {
+    label: "Roteiro Pronto",
+    shortLabel: "Roteiro Pronto",
+    variant: "warning",
+  },
+  ARTE_CANVA: {
+    label: "Arte no Canva",
+    shortLabel: "Arte no Canva",
+    variant: "secondary",
+  },
+  POSTADO: {
+    label: "Postado",
+    shortLabel: "Postado",
+    variant: "success",
+  },
+};
+
+export const STATUS_CONTEUDO_ORDEM: StatusConteudo[] = [
+  "IDEIA",
+  "ROTEIRO_PRONTO",
+  "ARTE_CANVA",
+  "POSTADO",
+];

@@ -39,6 +39,5 @@ export const DASHBOARD_NAV_ITEMS: NavItem[] = [
     label: "Conteúdo e Posts",
     href: "/conteudos",
     icon: CalendarHeart,
-    badge: "Em breve",
   },
 ];
